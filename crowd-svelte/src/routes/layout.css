@@ -1,0 +1,17 @@
+@import 'tailwindcss';
+
+/* Skeleton UI v4 — core styles, presets, and active theme. */
+@import '@skeletonlabs/skeleton';
+@import '@skeletonlabs/skeleton/themes/cerberus';
+
+/* Let Tailwind scan Skeleton's Svelte components for class usage. */
+@source '../../node_modules/@skeletonlabs/skeleton-svelte/dist';
+
+@plugin '@tailwindcss/typography';
+
+/* Inter is the dashboard's primary typeface (matches the legacy Crowd Control UI). */
+@theme {
+	--font-sans:
+		'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+		'Segoe UI Symbol', 'Noto Color Emoji';
+}
