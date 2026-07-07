@@ -2,18 +2,32 @@ package services
 
 import (
 	"context"
-	"log"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	pb "crowd-backend-grpc/proto"
 )
 
 // Capitalize the struct name so it can be exported and accessed by main.go
-type AddServer struct {
-	pb.UnimplementedAddServiceServer
+type CalculatorServer struct {
+	pb.UnimplementedCalculatorServiceServer
 }
 
-func (s *AddServer) Add(ctx context.Context, req *pb.AddRequest) (*pb.AddResponse, error) {
-	log.Printf("[AddService] Processing: %d + %d", req.GetA(), req.GetB())
-	result := req.GetA() + req.GetB()
-	return &pb.AddResponse{Result: result}, nil
+func (s *CalculatorServer) Operation(ctx context.Context, req *pb.BinaryRequest) (*pb.BinaryResponse, error) {
+	switch req.Operation {
+	case pb.BinaryRequest_ADD:
+		return &pb.BinaryResponse{Result: req.A + req.B}, nil
+	case pb.BinaryRequest_SUBTRACT:
+		return &pb.BinaryResponse{Result: req.A - req.B}, nil
+	case pb.BinaryRequest_MULTIPLY:
+		return &pb.BinaryResponse{Result: req.A * req.B}, nil
+	case pb.BinaryRequest_DIVIDE:
+		return &pb.BinaryResponse{Result: req.A / req.B}, nil
+	case pb.BinaryRequest_MODULO:
+		return &pb.BinaryResponse{Result: req.A % req.B}, nil
+	default:
+		return nil, status.Errorf(codes.InvalidArgument, "unknown operation: %v", req.Operation)
+	}
+
 }

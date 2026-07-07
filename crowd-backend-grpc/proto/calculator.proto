@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package calculator;
+
+option go_package = "crowd-backend-grpc/proto;hellopb";
+
+service CalculatorService {
+    rpc Operation(BinaryRequest) returns (BinaryResponse);
+}
+
+message BinaryRequest {
+  enum Operation {
+    ADD = 0;
+    SUBTRACT = 1;
+    MULTIPLY = 2;
+    DIVIDE = 3;
+    MODULO = 4;
+  }
+  Operation operation = 3;
+  int32 a = 1;
+  int32 b = 2;
+}
+
+message BinaryResponse {
+  int32 result = 1;
+}

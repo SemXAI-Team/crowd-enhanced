@@ -14,6 +14,13 @@ const dirname =
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
+	resolve: {
+		alias: {
+			// SvelteKit 3 dropped `$env/*` in favour of `$app/env/*`; shim the
+			// module `@auth/sveltekit` still imports. See authjs-env-shim.js.
+			'$env/dynamic/private': path.resolve(dirname, 'src/lib/server/authjs-env-shim.js')
+		}
+	},
 	plugins: [
 		tailwindcss(),
 		sveltekit({

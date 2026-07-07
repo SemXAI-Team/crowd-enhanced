@@ -1,0 +1,37 @@
+# CrowdGuard local dev database — PostgreSQL 16.
+#
+#   podman compose up -d       # start (detached)
+#   podman compose down        # stop & remove container — DATA SURVIVES (named volume)
+#   podman compose logs -f db  # tail logs
+#   podman compose down && podman volume rm crowd-pgdata   # full wipe
+#
+# Data lives on the named volume `crowd-pgdata` mounted at the Postgres data dir,
+# so it persists across `down`/recreation. Credentials are inlined for local dev
+# only and match DATABASE_URL in `.env` (postgres://crowd:crowd@localhost:5432/crowd);
+# move them to secrets for anything real.
+services:
+  db:
+    image: docker.io/library/postgres:16-alpine
+    container_name: crowd-db
+    environment:
+      POSTGRES_USER: crowd
+      POSTGRES_PASSWORD: crowd
+      POSTGRES_DB: crowd
+      # Must match the subdir the existing volume was initialised with.
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - '5432:5432'
+    volumes:
+      - crowd-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', 'crowd', '-d', 'crowd']
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  crowd-pgdata:
+    # Reuse the volume already created for this project (data carries over).
+    external: true
+    name: crowd-pgdata

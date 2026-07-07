@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package camera;
+
+// Shares the same generated Go package as the other protos in this directory.
+option go_package = "crowd-backend-grpc/proto;hellopb";
+
+// CameraStream serves live camera footage to the dashboard.
+//
+// gRPC is used only for *signalling* the WebRTC handshake — the encoded video
+// itself (produced by a DeepStream/GStreamer pipeline) flows peer-to-peer over
+// WebRTC directly to the browser, never through gRPC.
+service CameraStream {
+  // List the cameras available to stream (populates the dashboard picker).
+  rpc ListCameras(ListCamerasRequest) returns (ListCamerasResponse);
+
+  // WebRTC negotiation: the browser sends its SDP offer, the server wires the
+  // camera's DeepStream RTP output onto a WebRTC track and returns an SDP
+  // answer. Uses non-trickle ICE (candidates are embedded in the SDP), so a
+  // single round-trip is enough.
+  rpc Negotiate(NegotiateRequest) returns (NegotiateResponse);
+}
+
+message ListCamerasRequest {}
+
+message Camera {
+  string id = 1;
+  string name = 2;
+  string location = 3;
+  bool online = 4;
+}
+
+message ListCamerasResponse {
+  repeated Camera cameras = 1;
+}
+
+message NegotiateRequest {
+  string camera_id = 1;
+  // The browser's SDP offer (RTCSessionDescription.sdp).
+  string sdp_offer = 2;
+}
+
+message NegotiateResponse {
+  // The server's SDP answer (set as the browser's remote description).
+  string sdp_answer = 1;
+}

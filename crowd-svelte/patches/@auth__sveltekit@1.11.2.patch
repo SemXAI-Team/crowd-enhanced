@@ -1,0 +1,30 @@
+diff --git a/dist/client.js b/dist/client.js
+index 011c78aaa83e47befdbac5feb7487958ff0cfe38..17563406cb2e9b570391b25596637ec5f2431dae 100644
+--- a/dist/client.js
++++ b/dist/client.js
+@@ -1,4 +1,6 @@
+-import { base } from "$app/paths";
++// Patched for SvelteKit 3: `$app/paths` no longer exports `base` (breaks the
++// client ESM import). The app runs at the root, so an empty base is correct.
++const base = "";
+ export async function signIn(provider, options, authorizationParams) {
+     const { callbackUrl, ...rest } = options ?? {};
+     const { redirect = true, redirectTo = callbackUrl ?? window.location.href, ...signInParams } = rest;
+diff --git a/dist/env.js b/dist/env.js
+index a1a26c80305ed6c96cb4352a2cdea717362f47db..60b95b5ecb63a0564431b412d694d4846c3577a1 100644
+--- a/dist/env.js
++++ b/dist/env.js
+@@ -1,9 +1,11 @@
+ import { setEnvDefaults as coreSetEnvDefaults, skipCSRFCheck } from "@auth/core";
+ import { dev, building } from "$app/environment";
+-import { base } from "$app/paths";
++// Patched for SvelteKit 3: `$app/paths` no longer exports `base` (the import
++// is a hard MISSING_EXPORT error in the production bundler). App runs at root.
++const base = "";
+ export function setEnvDefaults(envObject, config) {
+     config.trustHost ??= dev;
+-    config.basePath = `${base}/auth`;
++    config.basePath = `${base ?? ''}/auth`;
+     config.skipCSRFCheck = skipCSRFCheck;
+     if (building)
+         return;

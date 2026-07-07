@@ -1,17 +1,28 @@
 <script>
-	import { enhance } from '$app/forms';
+	import { signIn } from '@auth/sveltekit/client';
+	import { goto } from '$app/navigation';
 
-	let { form } = $props();
-
+	let email = $state('');
+	let password = $state('');
 	let showPassword = $state(false);
 	let loading = $state(false);
+	let errorMessage = $state('');
 
-	const submit = () => {
+	/** @param {SubmitEvent} event */
+	const submit = async (event) => {
+		event.preventDefault();
 		loading = true;
-		return async ({ update }) => {
-			await update();
+		errorMessage = '';
+
+		const result = await signIn('credentials', { email, password, redirect: false });
+
+		if (result?.error) {
+			errorMessage = 'Invalid email or password.';
 			loading = false;
-		};
+			return;
+		}
+
+		await goto('/dashboard', { invalidateAll: true });
 	};
 </script>
 
@@ -62,7 +73,7 @@
 		>
 			<h2 class="mb-6 text-xl font-semibold text-white">Sign In</h2>
 
-			<form method="post" action="?/signInEmail" use:enhance={submit} class="space-y-5">
+			<form onsubmit={submit} class="space-y-5">
 				<div>
 					<label for="email" class="mb-2 block text-sm font-medium text-slate-300">Email</label>
 					<!-- svelte-ignore a11y_autofocus -->
@@ -70,7 +81,7 @@
 						id="email"
 						name="email"
 						type="email"
-						value={form?.email ?? ''}
+						bind:value={email}
 						placeholder="admin@semxai.com"
 						required
 						autofocus
@@ -88,6 +99,7 @@
 							id="password"
 							name="password"
 							type={showPassword ? 'text' : 'password'}
+							bind:value={password}
 							placeholder="••••••••"
 							required
 							autocomplete="current-password"
@@ -142,12 +154,12 @@
 					</div>
 				</div>
 
-				{#if form?.message}
+				{#if errorMessage}
 					<div
 						class="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400"
 						role="alert"
 					>
-						{form.message}
+						{errorMessage}
 					</div>
 				{/if}
 

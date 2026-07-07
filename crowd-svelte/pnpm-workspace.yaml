@@ -1,3 +1,5 @@
 onlyBuiltDependencies:
   - '@tailwindcss/oxide'
   - esbuild
+patchedDependencies:
+  '@auth/sveltekit@1.11.2': patches/@auth__sveltekit@1.11.2.patch

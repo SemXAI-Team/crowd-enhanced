@@ -8,31 +8,6 @@ option go_package = "crowd-backend-grpc/proto;hellopb";
 service GreeterService {
   rpc SayHello(HelloRequest) returns (HelloResponse);
 }
-service AddService {
-  rpc Add(AddRequest) returns (AddResponse);
-}
-
-service SplitterService {
-  rpc Split(SplitRequest) returns (SplitResponse);
-}
-
-message SplitRequest {
-  string text = 1;
-}
-
-message SplitResponse {
-  repeated string sentences = 1;
-}
-
-message AddRequest {
-  int32 a = 1;
-  int32 b = 2;
-}
-
-message AddResponse {
-  int32 result = 1;
-}
-
 
 message HelloRequest {
   string name = 1;
