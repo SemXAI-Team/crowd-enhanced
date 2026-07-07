@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
-	import { updateCamera, listModels } from '$lib/api';
+	import { updateCamera, listModels, fetchCameras } from '$lib/api';
 	import Icon from '$lib/components/Icon.svelte';
 	import CameraStream from '$lib/components/CameraStream.svelte';
 	import TelemetryWidget from '$lib/components/TelemetryWidget.svelte';
@@ -39,11 +39,8 @@
 	onMount(async () => {
 		try {
 			models = await listModels();
-			
-			const res = await fetch('http://localhost:8000/api/v1/cameras');
-			if (!res.ok) throw new Error('Failed to fetch cameras');
-			const data = await res.json();
-			const cam = (data.cameras || []).find((c) => c.id === id);
+			const cameras = await fetchCameras();
+			const cam = cameras.find((c) => c.id === id);
 			
 			if (cam) {
 				name = cam.name;
